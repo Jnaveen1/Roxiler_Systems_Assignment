@@ -26,8 +26,12 @@ const Login = () => {
       const targetRoute = getDefaultRouteForRole(user.role);
       navigate(targetRoute, { replace: true });
     } catch (err) {
-      const msg = err.response?.data?.message || 'Invalid login credentials. Please ensure case sensitivity (e.g. Admin@123).';
-      setError(msg);
+      if (err.message === 'Network Error' || err.code === 'ERR_NETWORK' || !err.response) {
+        setError('Network Error: Unable to reach Backend API at ' + (import.meta.env.VITE_API_URL || 'http://localhost:5000/api') + '. If testing on Vercel, please set VITE_API_URL to your deployed backend.');
+      } else {
+        const msg = err.response?.data?.message || 'Invalid login credentials. Please ensure case sensitivity (e.g. Admin@123).';
+        setError(msg);
+      }
     } finally {
       setIsSubmitting(false);
     }
